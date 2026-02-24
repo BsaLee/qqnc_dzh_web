@@ -561,7 +561,10 @@ async function api(path, method = 'GET', body = null) {
             if (!shouldIgnoreApiErrorLog(path, 401)) {
                 pushLocalUiLog(`[${method}] ${path} 未授权 (401)`, { module: 'frontend', event: 'api_error' });
             }
-            setLoginState(false);
+            // 只有在已登录时才调用setLoginState(false)，避免在首次添加账号时触发
+            if (adminToken) {
+                setLoginState(false);
+            }
             return null;
         }
         const j = await r.json();
@@ -697,9 +700,12 @@ function setLoginState(loggedIn) {
     isLoggedIn = loggedIn;
     if (loggedIn) {
         hideLogin();
-        startPolling();
+        // 延迟启动轮询和同步主题，避免在刚设置token时出现问题
+        setTimeout(() => {
+            startPolling();
+            syncThemeFromServer();
+        }, 100);
         loadAccounts();
-        syncThemeFromServer();
     } else {
         stopPolling();
         inFlightRequests.clear();
