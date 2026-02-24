@@ -409,18 +409,27 @@ $('btn-save-acc').addEventListener('click', async () => {
     qrMode = 'add';
     modal.classList.remove('show');
     
+    console.log('添加账号结果:', result, '当前adminToken:', adminToken);
+    
     // 如果是首次添加账号（没有adminToken），自动登录
     if (!adminToken && result && result.token) {
+        console.log('保存token:', result.token);
         adminToken = result.token;
-        localStorage.setItem('adminToken', adminToken);
+        localStorage.setItem('adminToken', result.token);
         if (result.accountId) {
             currentAccountId = result.accountId;
-            localStorage.setItem('currentAccountId', currentAccountId);
+            localStorage.setItem('currentAccountId', result.accountId);
         }
+        console.log('调用setLoginState(true)');
         setLoginState(true);
+    } else if (!adminToken && result) {
+        // 即使没有token字段，如果result存在且adminToken不存在，也尝试重新加载
+        console.log('result存在但没有token，尝试重新加载账号');
+        loadAccounts();
+        pollAccountLogs();
     } else {
-        // 即使没有token，也尝试加载账号（可能是编辑现有账号）
-        console.log('添加账号结果:', result);
+        // 编辑现有账号
+        console.log('编辑现有账号或其他情况');
         loadAccounts();
         pollAccountLogs();
     }
