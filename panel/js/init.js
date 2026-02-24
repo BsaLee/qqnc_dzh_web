@@ -73,6 +73,7 @@ initTheme();
 initPasswordToggles();
 
 // 初始化
+$('btn-add-account').addEventListener('click', () => { showAddAccountModal(); });
 $('btn-refresh').addEventListener('click', () => { window.location.reload(); });
 
 $('btn-theme').addEventListener('click', () => {

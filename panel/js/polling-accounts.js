@@ -41,13 +41,20 @@ async function loadAccounts() {
                     updateTopbarAccount(accounts[0]);
                 }
             } else if (accounts.length === 0) {
-                console.log('没有账号');
+                console.log('没有账号，清除登录状态');
+                // 清除本地缓存的token和code
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('currentAccountId');
+                adminToken = '';
+                currentAccountId = null;
                 $('current-account-name').textContent = '无账号';
                 updateTopbarAccount({ name: '无账号' });
                 resetDashboardStats();
                 clearFarmView('暂无账号');
                 clearFriendsView('暂无账号');
-                currentAccountId = null;
+                // 显示添加账号弹窗
+                showAddAccountModal();
+                return;
             } else {
                 // 多个账号的情况（不应该发生，但保留兼容性）
                 console.log('多个账号的情况');
@@ -315,6 +322,7 @@ async function pollStatus(options = {}) {
             resetLocalNextChecks();
             nextCheckSyncPending = false;
             if (currentAccountId) {
+                // 账号可能已被删除，重新加载账号列表
                 loadAccounts();
             }
             return;

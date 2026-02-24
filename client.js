@@ -12,6 +12,20 @@ const { MiniProgramLoginSession } = require('./src/qrlogin');
 const store = require('./src/store');
 const { getAccounts, addOrUpdateAccount, deleteAccount } = store;
 
+// 统一的删除账号函数
+function deleteAccountAndClearTokens(accountId, reason = '') {
+    try {
+        deleteAccount(accountId);
+        // 清除该账号的所有 token
+        if (dataProvider.clearAccountTokens) {
+            dataProvider.clearAccountTokens(accountId);
+        }
+        log('系统', `账号已删除并清除登录状态: ${accountId}${reason ? ` (${reason})` : ''}`);
+    } catch (e) {
+        log('错误', `删除账号失败: ${e.message}`);
+    }
+}
+
 // ============ 状态管理 ============
 // workers: { [accountId]: { process, status, logs: [], requestQueue: Map } }
 const workers = {};
@@ -516,11 +530,7 @@ function handleWorkerMessage(accountId, msg) {
                     { reason: 'offline_timeout', offlineMs }
                 );
                 stopWorker(accountId);
-                try {
-                    deleteAccount(accountId);
-                } catch (e) {
-                    log('错误', `删除离线账号失败: ${e.message}`);
-                }
+                deleteAccountAndClearTokens(accountId, 'offline_timeout');
             }
         }
     } else if (msg.type === 'log') {
@@ -553,11 +563,7 @@ function handleWorkerMessage(accountId, msg) {
             );
             // 停止 worker 并删除账号
             stopWorker(accountId);
-            try {
-                deleteAccount(accountId);
-            } catch (e) {
-                log('错误', `删除失效账号失败: ${e.message}`);
-            }
+            deleteAccountAndClearTokens(accountId, 'code_invalid');
         }
     } else if (msg.type === 'account_kicked') {
         const reason = msg.reason || '未知';
@@ -570,11 +576,7 @@ function handleWorkerMessage(accountId, msg) {
         });
         addAccountLog('kickout_delete', `账号 ${worker.name} 被踢下线，已自动删除`, accountId, worker.name, { reason });
         stopWorker(accountId);
-        try {
-            deleteAccount(accountId);
-        } catch (e) {
-            log('错误', `删除被踢下线账号失败: ${e.message}`);
-        }
+        deleteAccountAndClearTokens(accountId, `kickout:${reason}`);
     } else if (msg.type === 'api_response') {
         const { id, result, error } = msg;
         const req = worker.requests.get(id);
@@ -697,11 +699,7 @@ const dataProvider = {
 
     stopAccount: (id) => {
         stopWorker(id);
-        try {
-            deleteAccount(id);
-        } catch (e) {
-            log('错误', `删除停止的账号失败: ${e.message}`);
-        }
+        deleteAccountAndClearTokens(id, 'manual_stop');
     },
     restartAccount: (id) => {
         const data = getAccounts();

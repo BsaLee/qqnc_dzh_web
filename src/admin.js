@@ -27,13 +27,40 @@ function startAdminServer(dataProvider) {
     const tokens = new Map();  // token -> accountId
 
     const issueToken = () => crypto.randomBytes(24).toString('hex');
+    
+    // 清除指定账号的所有 token
+    const clearAccountTokens = (accountId) => {
+        const accountIdStr = String(accountId);
+        for (const [token, id] of tokens.entries()) {
+            if (String(id) === accountIdStr) {
+                tokens.delete(token);
+            }
+        }
+    };
+    
+    // 暴露清除 token 的方法给外部调用
+    if (provider) {
+        provider.clearAccountTokens = clearAccountTokens;
+    }
+    
     const authRequired = (req, res, next) => {
         const token = req.headers['x-admin-token'];
         if (!token || !tokens.has(token)) {
             return res.status(401).json({ ok: false, error: 'Unauthorized' });
         }
+        const accountId = tokens.get(token);
+        
+        // 验证账号是否还存在
+        const accounts = store.getAccounts().accounts || [];
+        const account = accounts.find(a => String(a.id) === String(accountId));
+        if (!account) {
+            // 账号已被删除，清除 token
+            tokens.delete(token);
+            return res.status(401).json({ ok: false, error: 'Account not found' });
+        }
+        
         req.adminToken = token;
-        req.accountId = tokens.get(token);  // 从 token 获取关联的账号 ID
+        req.accountId = accountId;
         next();
     };
 
