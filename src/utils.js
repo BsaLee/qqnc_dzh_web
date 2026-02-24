@@ -21,9 +21,13 @@ function toNum(val) {
 // ============ 时间相关 ============
 function now() {
     const d = new Date();
-    const hh = String(d.getHours()).padStart(2, '0');
-    const mm = String(d.getMinutes()).padStart(2, '0');
-    const ss = String(d.getSeconds()).padStart(2, '0');
+    // 转换为UTC+8北京时间
+    const utcTime = d.getTime() + d.getTimezoneOffset() * 60000;
+    const beijingTime = new Date(utcTime + 8 * 3600000);
+    
+    const hh = String(beijingTime.getUTCHours()).padStart(2, '0');
+    const mm = String(beijingTime.getUTCMinutes()).padStart(2, '0');
+    const ss = String(beijingTime.getUTCSeconds()).padStart(2, '0');
     return `${hh}:${mm}:${ss}`;
 }
 

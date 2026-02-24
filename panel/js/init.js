@@ -7,10 +7,16 @@ function updateUptimeDisplay() {
     }
 }
 
-function updateTime() {
+function getBeijingTime() {
     const now = new Date();
+    const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utcTime + 8 * 3600000);
+}
+
+function updateTime() {
+    const beijingTime = getBeijingTime();
     const el = document.getElementById('sys-time');
-    if (el) el.textContent = now.toLocaleTimeString();
+    if (el) el.textContent = beijingTime.toLocaleTimeString('zh-CN', { hour12: false });
 }
 setInterval(() => {
     updateTime();

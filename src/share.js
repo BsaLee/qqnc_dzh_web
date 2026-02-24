@@ -15,9 +15,13 @@ let lastClaimAt = 0;
 
 function getDateKey() {
     const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
+    // 转换为UTC+8北京时间
+    const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+    const beijingTime = new Date(utcTime + 8 * 3600000);
+    
+    const y = beijingTime.getUTCFullYear();
+    const m = String(beijingTime.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(beijingTime.getUTCDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
 }
 

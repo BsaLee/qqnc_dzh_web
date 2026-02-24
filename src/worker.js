@@ -28,12 +28,16 @@ function pad2(n) {
 
 function formatLocalDateTime24(date = new Date()) {
     const d = date instanceof Date ? date : new Date();
-    const y = d.getFullYear();
-    const m = pad2(d.getMonth() + 1);
-    const day = pad2(d.getDate());
-    const hh = pad2(d.getHours());
-    const mm = pad2(d.getMinutes());
-    const ss = pad2(d.getSeconds());
+    // 转换为UTC+8北京时间
+    const utcTime = d.getTime() + d.getTimezoneOffset() * 60000;
+    const beijingTime = new Date(utcTime + 8 * 3600000);
+    
+    const y = beijingTime.getUTCFullYear();
+    const m = pad2(beijingTime.getUTCMonth() + 1);
+    const day = pad2(beijingTime.getUTCDate());
+    const hh = pad2(beijingTime.getUTCHours());
+    const mm = pad2(beijingTime.getUTCMinutes());
+    const ss = pad2(beijingTime.getUTCSeconds());
     return `${y}-${m}-${day} ${hh}:${mm}:${ss}`;
 }
 
@@ -92,9 +96,13 @@ function isDailyRoutineEnabled(auto) {
 
 function getLocalDateKey() {
     const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
+    // 转换为UTC+8北京时间
+    const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+    const beijingTime = new Date(utcTime + 8 * 3600000);
+    
+    const y = beijingTime.getUTCFullYear();
+    const m = String(beijingTime.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(beijingTime.getUTCDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
 }
 

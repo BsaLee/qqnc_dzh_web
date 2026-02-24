@@ -271,6 +271,13 @@ function startQRCheck() {
                             } else {
                                 status.textContent = '✗ 保存失败: ' + (saveResult.error || '未知错误');
                                 status.style.color = '#F44336';
+                                console.log('QR扫码保存失败:', saveResult.error);
+                                // 提示用户重新扫码
+                                setTimeout(() => {
+                                    alert('保存账号失败，Code可能已失效。请重新扫码。');
+                                    resetQrState();
+                                    generateQRCode();
+                                }, 500);
                             }
                         } catch (e) {
                             status.textContent = '✗ 保存出错: ' + e.message;
@@ -415,9 +422,18 @@ $('btn-save-acc').addEventListener('click', async () => {
 
     stopQRCheck();
     qrMode = 'add';
-    modal.classList.remove('show');
     
     console.log('添加账号结果:', result, '当前adminToken:', adminToken);
+    
+    // 如果添加账号失败
+    if (!result) {
+        console.log('添加账号失败，code可能已失效');
+        alert('添加账号失败，Code可能已失效。请重新扫码或输入新的Code。');
+        // 不关闭弹窗，让用户重新尝试
+        return;
+    }
+    
+    modal.classList.remove('show');
     
     // 如果是首次添加账号（没有adminToken），自动登录
     if (!adminToken && result && result.token) {
