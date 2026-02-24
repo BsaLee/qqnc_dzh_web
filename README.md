@@ -2,6 +2,11 @@
 
 这是一个基于 Node.js 的 QQ 农场自动化项目，支持多账号运行、Web 控制面板、自动农场/好友/任务流程和数据分析。
 
+## 🔗 项目来源
+
+- **Web UI 作者仓库**: [Penty-d/qq-farm-bot-ui-nodejs](https://github.com/Penty-d/qq-farm-bot-uinodejs)
+- **原作者仓库**: [linguo2625469/qq-farm-bot](https://github.com/linguo2625469/qq-farm-bot)
+
 ## 📋 目录
 
 - [功能特性](#功能特性)

@@ -544,12 +544,20 @@ function handleWorkerMessage(accountId, msg) {
         const message = msg.message || '';
         worker.wsError = { code, message, at: Date.now() };
         if (code === 400) {
+            log('系统', `账号 ${worker.name} 登录失效，已自动删除账号`);
             addAccountLog(
                 'ws_400',
-                `账号 ${worker.name} 登录失效，请更新 Code`,
+                `账号 ${worker.name} 登录失效，已自动删除`,
                 accountId,
                 worker.name
             );
+            // 停止 worker 并删除账号
+            stopWorker(accountId);
+            try {
+                deleteAccount(accountId);
+            } catch (e) {
+                log('错误', `删除失效账号失败: ${e.message}`);
+            }
         }
     } else if (msg.type === 'account_kicked') {
         const reason = msg.reason || '未知';

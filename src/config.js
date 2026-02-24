@@ -14,7 +14,7 @@ const CONFIG = {
     farmCheckIntervalMax: 2000,   // 新逻辑：农场巡查间隔最大值(ms)
     friendCheckIntervalMin: 10000,// 新逻辑：好友巡查间隔最小值(ms)
     friendCheckIntervalMax: 10000,// 新逻辑：好友巡查间隔最大值(ms)
-    adminPort: 3000,             // 管理面板 HTTP 端口
+    adminPort: process.env.PORT || 3000,  // 管理面板 HTTP 端口（Render 会提供 PORT 环境变量）
     adminPassword: process.env.ADMIN_PASSWORD || 'admin',
 };
 
