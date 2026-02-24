@@ -308,6 +308,12 @@ $('btn-add-acc-modal').addEventListener('click', () => {
     generateQRCode();
     modal.querySelector('h3').textContent = '添加账号';
     modal.classList.add('show');
+    
+    // 清除旧的token和账号信息，防止缓存导致的问题
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('currentAccountId');
+    adminToken = '';
+    currentAccountId = null;
 });
 
 // 标签页切换

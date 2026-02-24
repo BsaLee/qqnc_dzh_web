@@ -637,6 +637,12 @@ function showAddAccountModal() {
         if (title) title.textContent = '添加账号';
         modal.classList.add('show');
     }
+    
+    // 清除旧的token和账号信息，防止缓存导致的问题
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('currentAccountId');
+    adminToken = '';
+    currentAccountId = null;
 }
 
 function stopPolling() {
