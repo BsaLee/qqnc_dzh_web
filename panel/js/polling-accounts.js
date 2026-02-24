@@ -8,6 +8,24 @@ async function loadAccounts() {
         console.log('loadAccounts返回的list:', list, '类型:', typeof list);
         if (list && list.accounts) {
             console.log('list.accounts存在，长度:', list.accounts.length);
+            
+            // 检查当前账号的状态是否从运行中变为已停止
+            if (currentAccountId) {
+                const oldAcc = accounts.find(a => a.id === currentAccountId);
+                const newAcc = list.accounts.find(a => a.id === currentAccountId);
+                if (oldAcc && newAcc && oldAcc.running === true && newAcc.running === false) {
+                    console.log('账号状态从运行中变为已停止，清除本地缓存');
+                    // 清除本地缓存的token和code
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('currentAccountId');
+                    adminToken = '';
+                    currentAccountId = null;
+                    // 显示添加账号弹窗
+                    showAddAccountModal();
+                    return;
+                }
+            }
+            
             accounts = list.accounts;
             console.log('更新后的accounts:', JSON.stringify(accounts));
             
