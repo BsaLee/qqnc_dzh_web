@@ -4,12 +4,15 @@ const wsErrorNotifiedAt = {};
 async function loadAccounts() {
     return runDedupedRequest('loadAccounts', async () => {
         const list = await api('/api/accounts');
+        console.log('loadAccounts返回的list:', list);
         if (list && list.accounts) {
             accounts = list.accounts;
+            console.log('更新后的accounts:', accounts);
             
             // 由于登录后只能看到自己的账号，通常只有一个
             if (accounts.length === 1) {
                 // 自动选择唯一的账号
+                console.log('自动选择唯一的账号:', accounts[0]);
                 if (!currentAccountId || currentAccountId !== accounts[0].id) {
                     switchAccount(accounts[0].id);
                 }
@@ -28,6 +31,8 @@ async function loadAccounts() {
                 }
             }
             renderLogFilterOptions();
+        } else {
+            console.log('loadAccounts: list为null或没有accounts属性');
         }
     });
 }

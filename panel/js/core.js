@@ -710,11 +710,12 @@ function setLoginState(loggedIn) {
         setTimeout(() => {
             startPolling();
             syncThemeFromServer();
-        }, 100);
+        }, 200);
         // 延迟加载账号，确保token已经被正确设置
         setTimeout(() => {
+            console.log('setLoginState(true)中调用loadAccounts');
             loadAccounts();
-        }, 50);
+        }, 100);
     } else {
         stopPolling();
         inFlightRequests.clear();
