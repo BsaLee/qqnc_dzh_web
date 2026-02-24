@@ -4,9 +4,34 @@ function updateUptimeDisplay() {
         const currentUptime = lastServerUptime + elapsed;
         const el = $('stat-uptime');
         if (el) el.textContent = fmtTime(currentUptime);
-        // 同时更新顶部的运行时间显示
-        const topbarEl = $('topbar-uptime-value');
-        if (topbarEl) topbarEl.textContent = fmtTime(currentUptime);
+    }
+}
+
+let systemUptimeBase = 0;
+let systemUptimeSyncTime = 0;
+
+function updateSystemUptime() {
+    // 获取系统运行时间
+    fetch(API_ROOT + '/api/system-info')
+        .then(r => r.json())
+        .then(j => {
+            if (j.ok && j.data && typeof j.data.systemUptime === 'number') {
+                systemUptimeBase = j.data.systemUptime;
+                systemUptimeSyncTime = Date.now();
+                updateTopbarUptime();
+            }
+        })
+        .catch(() => {
+            // 获取失败，不更新
+        });
+}
+
+function updateTopbarUptime() {
+    const topbarEl = $('topbar-uptime-value');
+    if (topbarEl && systemUptimeSyncTime > 0) {
+        const elapsed = (Date.now() - systemUptimeSyncTime) / 1000;
+        const currentSystemUptime = systemUptimeBase + elapsed;
+        topbarEl.textContent = fmtTime(currentSystemUptime);
     }
 }
 
@@ -24,8 +49,16 @@ function updateTime() {
 setInterval(() => {
     updateTime();
     updateUptimeDisplay();
+    updateTopbarUptime();
 }, 1000);
+
+// 每30秒更新一次系统运行时间
+setInterval(() => {
+    updateSystemUptime();
+}, 30000);
+
 updateTime();
+updateSystemUptime();
 lockHorizontalSwipeOnMobile();
 applyFontScale();
 window.addEventListener('resize', applyFontScale);

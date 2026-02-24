@@ -84,6 +84,17 @@ function startAdminServer(dataProvider) {
         res.json({ ok: true, data: { ok: true } });
     });
 
+    app.get('/api/system-info', (req, res) => {
+        try {
+            const allAccounts = store.getAccounts();
+            const totalAccountsCount = (allAccounts.accounts || []).length;
+            const systemUptime = process.uptime();
+            res.json({ ok: true, data: { totalAccountsCount, systemUptime } });
+        } catch (e) {
+            res.status(500).json({ ok: false, error: e.message });
+        }
+    });
+
     app.post('/api/logout', (req, res) => {
         const token = req.adminToken;
         if (token) tokens.delete(token);
