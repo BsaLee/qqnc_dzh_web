@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "client.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "panel/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "gameConfig/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "proto/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/panel/(.*)",
+      "dest": "/panel/$1"
+    },
+    {
+      "src": "/gameConfig/(.*)",
+      "dest": "/gameConfig/$1"
+    },
+    {
+      "src": "/proto/(.*)",
+      "dest": "/proto/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client.js"
+    }
+  ],
+  "env": {
+    "PORT": "3000"
+  }
+}
