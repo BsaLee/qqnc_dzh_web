@@ -237,9 +237,14 @@ function startQRCheck() {
                                 if (!payload.avatar) payload.avatar = acc.avatar || '';
                             }
 
+                            const headers = { 'Content-Type': 'application/json' };
+                            if (adminToken) {
+                                headers['x-admin-token'] = adminToken;
+                            }
+                            
                             const saveResult = await fetch('/api/accounts', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'x-admin-token': adminToken },
+                                headers,
                                 body: JSON.stringify(payload)
                             }).then(r => r.json());
 
@@ -247,7 +252,18 @@ function startQRCheck() {
                                 status.textContent = '✓ 保存成功';
                                 setTimeout(() => {
                                     modal.classList.remove('show');
-                                    loadAccounts();
+                                    // 如果是首次添加账号（没有adminToken），自动登录
+                                    if (!adminToken && saveResult.data && saveResult.data.token) {
+                                        adminToken = saveResult.data.token;
+                                        localStorage.setItem('adminToken', adminToken);
+                                        if (saveResult.data.accountId) {
+                                            currentAccountId = saveResult.data.accountId;
+                                            localStorage.setItem('currentAccountId', currentAccountId);
+                                        }
+                                        setLoginState(true);
+                                    } else {
+                                        loadAccounts();
+                                    }
                                 }, 1000);
                                 qrMode = 'add';
                             } else {
@@ -387,13 +403,25 @@ $('btn-save-acc').addEventListener('click', async () => {
     const payload = { name, code, platform };
     if (editingAccountId) payload.id = editingAccountId;
 
-    await api('/api/accounts', 'POST', payload);
+    const result = await api('/api/accounts', 'POST', payload);
 
     stopQRCheck();
     qrMode = 'add';
     modal.classList.remove('show');
-    loadAccounts();
-    pollAccountLogs();
+    
+    // 如果是首次添加账号（没有adminToken），自动登录
+    if (!adminToken && result && result.token) {
+        adminToken = result.token;
+        localStorage.setItem('adminToken', adminToken);
+        if (result.accountId) {
+            currentAccountId = result.accountId;
+            localStorage.setItem('currentAccountId', currentAccountId);
+        }
+        setLoginState(true);
+    } else {
+        loadAccounts();
+        pollAccountLogs();
+    }
 });
 
 window.deleteAccount = async (id) => {

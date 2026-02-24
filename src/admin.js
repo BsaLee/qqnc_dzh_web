@@ -73,6 +73,8 @@ function startAdminServer(dataProvider) {
 
     app.use('/api', (req, res, next) => {
         if (req.path === '/login' || req.path === '/qr/create' || req.path === '/qr/check') return next();
+        // 允许首次添加账号（POST /api/accounts 无需token）
+        if (req.method === 'POST' && req.path === '/accounts') return next();
         return authRequired(req, res, next);
     });
 
@@ -317,8 +319,8 @@ function startAdminServer(dataProvider) {
             const isUpdate = !!req.body.id;
             
             if (isUpdate) {
-                // 更新时，只能更新自己的账号
-                if (String(req.body.id) !== String(userAccountId)) {
+                // 更新时，需要token且只能更新自己的账号
+                if (!userAccountId || String(req.body.id) !== String(userAccountId)) {
                     return res.status(403).json({ ok: false, error: 'Forbidden' });
                 }
             }
@@ -347,7 +349,20 @@ function startAdminServer(dataProvider) {
                 // 如果是更新，且之前在运行，则重启
                 provider.restartAccount(req.body.id);
             }
-            res.json({ ok: true, data });
+            
+            // 如果是首次添加账号（没有token），生成token并返回
+            const responseData = { ...data };
+            if (!isUpdate && !userAccountId) {
+                const newAcc = data.accounts[data.accounts.length - 1];
+                if (newAcc) {
+                    const token = issueToken();
+                    tokens.set(token, String(newAcc.id));
+                    responseData.token = token;
+                    responseData.accountId = newAcc.id;
+                }
+            }
+            
+            res.json({ ok: true, data: responseData });
         } catch (e) {
             res.status(500).json({ ok: false, error: e.message });
         }

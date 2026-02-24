@@ -38,15 +38,6 @@ $('btn-theme').addEventListener('click', () => {
     }
 });
 
-const loginBtn = $('btn-login');
-if (loginBtn) loginBtn.addEventListener('click', doLogin);
-const loginInput = $('login-code');
-if (loginInput) {
-    loginInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') doLogin();
-    });
-}
-
 const logsFilterSel = $('logs-account-filter');
 if (logsFilterSel) {
     logsFilterSel.value = logFilterAccountId;

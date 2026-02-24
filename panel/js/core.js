@@ -579,6 +579,45 @@ function hideLogin() {
     if (msg) msg.textContent = '';
 }
 
+function showAddAccountModal() {
+    // 触发添加账号弹窗
+    if (typeof editingAccountId !== 'undefined') {
+        editingAccountId = null;
+    }
+    if (typeof setQrMode === 'function') {
+        setQrMode('add');
+    }
+    const nameInput = $('acc-name');
+    const codeInput = $('acc-code');
+    const nameQrInput = $('acc-name-qr');
+    const platformSelect = $('acc-platform');
+    if (nameInput) nameInput.value = '';
+    if (codeInput) codeInput.value = '';
+    if (nameQrInput) nameQrInput.value = '';
+    if (platformSelect) platformSelect.value = 'qq';
+    if (typeof resetQrState === 'function') {
+        resetQrState();
+    }
+    if (typeof syncQrOpenButtonVisibility === 'function') {
+        syncQrOpenButtonVisibility();
+    }
+    if (typeof switchTab === 'function') {
+        switchTab('qrcode');
+    }
+    if (typeof stopQRCheck === 'function') {
+        stopQRCheck();
+    }
+    if (typeof generateQRCode === 'function') {
+        generateQRCode();
+    }
+    const modal = $('modal-add-acc');
+    if (modal) {
+        const title = modal.querySelector('h3');
+        if (title) title.textContent = '添加账号';
+        modal.classList.add('show');
+    }
+}
+
 function stopPolling() {
     if (pollTimer) {
         clearTimeout(pollTimer);
@@ -653,11 +692,11 @@ function setLoginState(loggedIn) {
         logFilterAccountId = 'all';
         $('current-account-name').textContent = '未登录';
         updateTopbarAccount({ name: '未登录' });
-        $('conn-text').textContent = '请登录';
+        $('conn-text').textContent = '请添加账号';
         $('conn-dot').className = 'dot offline';
-        clearFarmView('请先登录');
-        clearFriendsView('请先登录');
-        showLogin('');
+        clearFarmView('请先添加账号');
+        clearFriendsView('请先添加账号');
+        showAddAccountModal();
     }
 }
 
@@ -671,38 +710,6 @@ async function checkLogin() {
         setLoginState(true);
     } else {
         setLoginState(false);
-    }
-}
-
-async function doLogin() {
-    const code = $('login-code').value;
-    if (!code) {
-        showLogin('请输入 Code');
-        return;
-    }
-    try {
-        const r = await fetch(API_ROOT + '/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code })
-        });
-        if (r.status === 401) {
-            showLogin('Code 无效或不存在');
-            return;
-        }
-        const j = await r.json();
-        if (j && j.ok && j.data && j.data.token) {
-            adminToken = j.data.token;
-            currentAccountId = j.data.accountId;
-            localStorage.setItem('adminToken', adminToken);
-            localStorage.setItem('currentAccountId', currentAccountId);
-            setLoginState(true);
-        } else {
-            showLogin('登录失败');
-        }
-    } catch (e) {
-        console.error('Login Error:', e);
-        showLogin('登录失败');
     }
 }
 
