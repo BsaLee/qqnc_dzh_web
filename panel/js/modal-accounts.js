@@ -431,8 +431,11 @@ $('btn-save-acc').addEventListener('click', async () => {
     } else if (!adminToken && result) {
         // 即使没有token字段，如果result存在且adminToken不存在，也尝试重新加载
         console.log('result存在但没有token，尝试重新加载账号');
-        loadAccounts();
-        pollAccountLogs();
+        // 延迟加载，确保token已经被正确设置
+        setTimeout(() => {
+            loadAccounts();
+            pollAccountLogs();
+        }, 100);
     } else {
         // 编辑现有账号
         console.log('编辑现有账号或其他情况');
