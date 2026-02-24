@@ -68,16 +68,21 @@ async function loadAccounts() {
 
 function updateTopbarAccountsCount() {
     const el = $('topbar-accounts-value');
+    console.log('updateTopbarAccountsCount: el:', el);
     if (el) {
         // 获取全部账号的总数
+        console.log('updateTopbarAccountsCount: 开始获取全部账号总数');
         fetch(API_ROOT + '/api/system-info')
             .then(r => r.json())
             .then(j => {
+                console.log('updateTopbarAccountsCount: 获取到数据:', j);
                 if (j.ok && j.data) {
+                    console.log('updateTopbarAccountsCount: 账号总数:', j.data.totalAccountsCount);
                     el.textContent = j.data.totalAccountsCount || 0;
                 }
             })
-            .catch(() => {
+            .catch((err) => {
+                console.error('updateTopbarAccountsCount: 获取失败:', err);
                 // 如果获取失败，使用本地账号数量作为备选
                 el.textContent = accounts.length;
             });

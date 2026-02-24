@@ -72,7 +72,7 @@ function startAdminServer(dataProvider) {
     });
 
     app.use('/api', (req, res, next) => {
-        if (req.path === '/login' || req.path === '/qr/create' || req.path === '/qr/check') return next();
+        if (req.path === '/login' || req.path === '/qr/create' || req.path === '/qr/check' || req.path === '/system-info') return next();
         // 允许首次添加账号（POST /api/accounts 无需token）
         if (req.method === 'POST' && req.path === '/accounts') return next();
         return authRequired(req, res, next);

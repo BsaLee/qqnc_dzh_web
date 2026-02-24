@@ -12,25 +12,30 @@ let systemUptimeSyncTime = 0;
 
 function updateSystemUptime() {
     // 获取系统运行时间
+    console.log('updateSystemUptime: 开始获取系统运行时间');
     fetch(API_ROOT + '/api/system-info')
         .then(r => r.json())
         .then(j => {
+            console.log('updateSystemUptime: 获取到数据:', j);
             if (j.ok && j.data && typeof j.data.systemUptime === 'number') {
                 systemUptimeBase = j.data.systemUptime;
                 systemUptimeSyncTime = Date.now();
+                console.log('updateSystemUptime: 系统运行时间:', systemUptimeBase);
                 updateTopbarUptime();
             }
         })
-        .catch(() => {
-            // 获取失败，不更新
+        .catch((err) => {
+            console.error('updateSystemUptime: 获取失败:', err);
         });
 }
 
 function updateTopbarUptime() {
     const topbarEl = $('topbar-uptime-value');
+    console.log('updateTopbarUptime: topbarEl:', topbarEl, 'systemUptimeSyncTime:', systemUptimeSyncTime);
     if (topbarEl && systemUptimeSyncTime > 0) {
         const elapsed = (Date.now() - systemUptimeSyncTime) / 1000;
         const currentSystemUptime = systemUptimeBase + elapsed;
+        console.log('updateTopbarUptime: 更新为:', fmtTime(currentSystemUptime));
         topbarEl.textContent = fmtTime(currentSystemUptime);
     }
 }
