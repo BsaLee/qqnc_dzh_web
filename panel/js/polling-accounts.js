@@ -3,20 +3,27 @@ const wsErrorNotifiedAt = {};
 
 async function loadAccounts() {
     return runDedupedRequest('loadAccounts', async () => {
+        console.log('开始loadAccounts，当前adminToken:', adminToken, '当前currentAccountId:', currentAccountId);
         const list = await api('/api/accounts');
-        console.log('loadAccounts返回的list:', list);
+        console.log('loadAccounts返回的list:', list, '类型:', typeof list);
         if (list && list.accounts) {
+            console.log('list.accounts存在，长度:', list.accounts.length);
             accounts = list.accounts;
-            console.log('更新后的accounts:', accounts);
+            console.log('更新后的accounts:', JSON.stringify(accounts));
             
             // 由于登录后只能看到自己的账号，通常只有一个
             if (accounts.length === 1) {
                 // 自动选择唯一的账号
-                console.log('自动选择唯一的账号:', accounts[0]);
+                console.log('自动选择唯一的账号:', JSON.stringify(accounts[0]));
                 if (!currentAccountId || currentAccountId !== accounts[0].id) {
+                    console.log('调用switchAccount，accountId:', accounts[0].id);
                     switchAccount(accounts[0].id);
+                } else {
+                    console.log('currentAccountId已经是该账号，直接更新topbar');
+                    updateTopbarAccount(accounts[0]);
                 }
             } else if (accounts.length === 0) {
+                console.log('没有账号');
                 $('current-account-name').textContent = '无账号';
                 updateTopbarAccount({ name: '无账号' });
                 resetDashboardStats();
@@ -25,6 +32,7 @@ async function loadAccounts() {
                 currentAccountId = null;
             } else {
                 // 多个账号的情况（不应该发生，但保留兼容性）
+                console.log('多个账号的情况');
                 renderAccountSelector();
                 if (!currentAccountId && accounts.length > 0) {
                     switchAccount(accounts[0].id);
@@ -32,7 +40,7 @@ async function loadAccounts() {
             }
             renderLogFilterOptions();
         } else {
-            console.log('loadAccounts: list为null或没有accounts属性');
+            console.log('loadAccounts: list为null或没有accounts属性，list:', list);
         }
     });
 }
@@ -56,15 +64,20 @@ function renderAccountSelector() {
 }
 
 function switchAccount(id) {
+    console.log('switchAccount called with id:', id, 'current accounts:', JSON.stringify(accounts));
     currentAccountId = id;
     localStorage.setItem(CURRENT_ACCOUNT_STORAGE_KEY, String(id || ''));
     expHistory = [];
     lastOperationsData = {};
     renderAccountSelector();
     const acc = accounts.find(a => a.id === id);
+    console.log('找到的账号:', JSON.stringify(acc));
     if (acc) {
+        console.log('更新topbar账号为:', acc.name);
         $('current-account-name').textContent = acc.name;
         updateTopbarAccount(acc);
+    } else {
+        console.log('未找到id为', id, '的账号');
     }
     const seedSel = $('seed-select');
     if (seedSel) {

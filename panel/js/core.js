@@ -160,13 +160,18 @@ function pickAccountAvatar(acc) {
 }
 
 function updateTopbarAccount(acc) {
+    console.log('updateTopbarAccount called with:', JSON.stringify(acc));
     const nameEl = $('topbar-account-name');
     const statusEl = $('topbar-account-status');
     const avatarEl = $('topbar-account-avatar');
     const fallbackEl = $('topbar-account-fallback');
-    if (!nameEl || !statusEl || !avatarEl || !fallbackEl) return;
+    if (!nameEl || !statusEl || !avatarEl || !fallbackEl) {
+        console.log('缺少必要的DOM元素');
+        return;
+    }
 
     const name = (acc && acc.name) ? String(acc.name) : '未选择账号';
+    console.log('设置账号名称为:', name);
     nameEl.textContent = name;
     if (acc && typeof acc.running === 'boolean') {
         statusEl.textContent = acc.running ? '运行中' : '已停止';
@@ -703,11 +708,13 @@ function startPolling() {
 }
 
 function setLoginState(loggedIn) {
+    console.log('setLoginState called with:', loggedIn, 'adminToken:', adminToken);
     isLoggedIn = loggedIn;
     if (loggedIn) {
         hideLogin();
         // 延迟启动轮询和同步主题，避免在刚设置token时出现问题
         setTimeout(() => {
+            console.log('setLoginState(true)中启动轮询和同步主题');
             startPolling();
             syncThemeFromServer();
         }, 200);
@@ -717,6 +724,7 @@ function setLoginState(loggedIn) {
             loadAccounts();
         }, 100);
     } else {
+        console.log('setLoginState(false)，清除登录状态');
         stopPolling();
         inFlightRequests.clear();
         currentAccountId = null;

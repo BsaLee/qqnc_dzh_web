@@ -260,8 +260,10 @@ function startQRCheck() {
                                             currentAccountId = saveResult.data.accountId;
                                             localStorage.setItem('currentAccountId', currentAccountId);
                                         }
+                                        console.log('QR扫码登录成功，调用setLoginState(true)');
                                         setLoginState(true);
                                     } else {
+                                        console.log('QR扫码登录后调用loadAccounts');
                                         loadAccounts();
                                     }
                                 }, 1000);
