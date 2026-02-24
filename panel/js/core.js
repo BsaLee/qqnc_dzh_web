@@ -106,7 +106,8 @@ function matchLogFilters(entry) {
     const timeToMs = logFilters.timeTo ? Date.parse(String(logFilters.timeTo)) : NaN;
     const logMs = toLogTs(e);
 
-    if (logFilterAccountId && logFilterAccountId !== 'all') {
+    // 只显示当前选中账号的日志
+    if (logFilterAccountId) {
         if (String(e.accountId || '') !== String(logFilterAccountId)) return false;
     }
     if (moduleName && String((e.meta || {}).module || '') !== moduleName) return false;
@@ -404,14 +405,28 @@ function renderLogFilterOptions() {
     const sel = $('logs-account-filter');
     if (!sel) return;
 
-    const hasSelected = logFilterAccountId === 'all' || accounts.some(a => a.id === logFilterAccountId);
-    if (!hasSelected) logFilterAccountId = 'all';
-
-    const options = ['<option value="all">全部账号</option>'];
+    // 用户只能看到自己的账号日志，不显示"全部账号"选项
+    const options = [];
     accounts.forEach(acc => {
         options.push(`<option value="${acc.id}">${escapeHtml(acc.name)}</option>`);
     });
+    
+    // 如果没有账号，显示提示
+    if (options.length === 0) {
+        options.push('<option value="">暂无账号</option>');
+        sel.innerHTML = options.join('');
+        sel.disabled = true;
+        return;
+    }
+    
     sel.innerHTML = options.join('');
+    sel.disabled = false;
+    
+    // 确保选中的账号存在
+    const hasSelected = accounts.some(a => a.id === logFilterAccountId);
+    if (!hasSelected && accounts.length > 0) {
+        logFilterAccountId = accounts[0].id;
+    }
     sel.value = logFilterAccountId;
 }
 
@@ -434,7 +449,10 @@ function initLogFiltersUI() {
 function buildLogQuery() {
     const p = new URLSearchParams();
     p.set('limit', '1000');
-    p.set('accountId', logFilterAccountId || 'all');
+    // 只发送当前账号的ID，不再支持'all'
+    if (logFilterAccountId) {
+        p.set('accountId', logFilterAccountId);
+    }
     if (logFilters.module) p.set('module', logFilters.module);
     if (logFilters.event) p.set('event', logFilters.event);
     if (logFilters.keyword) p.set('keyword', logFilters.keyword);

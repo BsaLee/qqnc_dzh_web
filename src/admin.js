@@ -403,7 +403,8 @@ function startAdminServer(dataProvider) {
     // API: 日志
     app.get('/api/logs', (req, res) => {
         const queryAccountIdRaw = (req.query.accountId || '').toString().trim();
-        const id = queryAccountIdRaw ? (queryAccountIdRaw === 'all' ? '' : queryAccountIdRaw) : getAccId(req);
+        // 用户只能查看自己账号的日志，不能查看其他账号的日志
+        const id = queryAccountIdRaw && queryAccountIdRaw !== 'all' ? queryAccountIdRaw : getAccId(req);
         const options = {
             limit: parseInt(req.query.limit) || 100,
             tag: req.query.tag || '',
