@@ -51,7 +51,13 @@
 
     <main class="app-main">
       <header class="topbar">
-        <h1 id="page-title">概览</h1>
+        <div class="topbar-title-section">
+          <h1 id="page-title">概览</h1>
+          <div class="topbar-info">
+            <span id="topbar-uptime" class="topbar-info-item"><i class="fas fa-clock"></i> 运行: <span id="topbar-uptime-value">0:00</span></span>
+            <span id="topbar-accounts" class="topbar-info-item"><i class="fas fa-user-circle"></i> 账号: <span id="topbar-accounts-value">0</span></span>
+          </div>
+        </div>
         <div class="topbar-actions">
           <button id="btn-refresh" class="icon-btn" title="刷新"><i class="fas fa-sync-alt"></i></button>
           <button id="btn-theme" class="icon-btn" title="切换主题"><i class="fas fa-moon"></i></button>

@@ -60,7 +60,17 @@ async function loadAccounts() {
         } else {
             console.log('loadAccounts: list为null或没有accounts属性，list:', list);
         }
+        
+        // 更新顶部账号数量显示
+        updateTopbarAccountsCount();
     });
+}
+
+function updateTopbarAccountsCount() {
+    const el = $('topbar-accounts-value');
+    if (el) {
+        el.textContent = accounts.length;
+    }
 }
 
 function renderAccountSelector() {

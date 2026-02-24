@@ -4,6 +4,9 @@ function updateUptimeDisplay() {
         const currentUptime = lastServerUptime + elapsed;
         const el = $('stat-uptime');
         if (el) el.textContent = fmtTime(currentUptime);
+        // 同时更新顶部的运行时间显示
+        const topbarEl = $('topbar-uptime-value');
+        if (topbarEl) topbarEl.textContent = fmtTime(currentUptime);
     }
 }
 
@@ -146,5 +149,8 @@ if (logsTimeToInput) {
 }
 
 initLogFiltersUI();
+
+// 初始化顶部账号数量显示
+updateTopbarAccountsCount();
 
 checkLogin();

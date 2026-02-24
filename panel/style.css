@@ -102,7 +102,11 @@ body.light-theme .account-option:hover { background: rgba(0,0,0,0.05); }
 
 .app-main { display: grid; grid-template-rows: var(--topbar-height) 1fr; min-width: 0; max-width: 100%; overflow-x: hidden; }
 .topbar { border-bottom: 1px solid var(--line); background: var(--panel); padding: 0 clamp(10px, calc(14px * var(--font-scale)), 20px); display: flex; align-items: center; justify-content: space-between; height: var(--topbar-height); }
-.topbar h1 { margin: 0; font-size: calc(22px * var(--font-scale)); }
+.topbar-title-section { display: flex; align-items: center; gap: clamp(12px, 2vw, 24px); min-width: 0; }
+.topbar h1 { margin: 0; font-size: calc(22px * var(--font-scale)); white-space: nowrap; }
+.topbar-info { display: flex; gap: clamp(12px, 2vw, 20px); font-size: calc(13px * var(--font-scale)); color: var(--text-sub); }
+.topbar-info-item { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.topbar-info-item i { font-size: calc(12px * var(--font-scale)); }
 .topbar-actions { display: flex; gap: 6px; }
 .topbar-actions { gap: clamp(6px, 0.8vh, 12px); }
 .icon-btn {
