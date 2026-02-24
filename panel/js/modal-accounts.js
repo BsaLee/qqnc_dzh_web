@@ -419,6 +419,8 @@ $('btn-save-acc').addEventListener('click', async () => {
         }
         setLoginState(true);
     } else {
+        // 即使没有token，也尝试加载账号（可能是编辑现有账号）
+        console.log('添加账号结果:', result);
         loadAccounts();
         pollAccountLogs();
     }

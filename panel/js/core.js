@@ -705,7 +705,10 @@ function setLoginState(loggedIn) {
             startPolling();
             syncThemeFromServer();
         }, 100);
-        loadAccounts();
+        // 延迟加载账号，确保token已经被正确设置
+        setTimeout(() => {
+            loadAccounts();
+        }, 50);
     } else {
         stopPolling();
         inFlightRequests.clear();
