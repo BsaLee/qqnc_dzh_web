@@ -958,7 +958,9 @@ async function pollAccountLogs() {
                 add: '添加',
                 update: '更新',
                 delete: '删除',
+                stop_delete: '停止删除',
                 kickout_delete: '踢下线删除',
+                offline_delete: '离线删除',
                 ws_400: '登录失效',
             };
             const action = actionMap[l.action] || l.action || '操作';
@@ -981,6 +983,10 @@ window.startAccount = async (id) => {
 };
 
 window.stopAccount = async (id) => {
+    // 确认停止并删除账号
+    if (!confirm('停止账号将会删除账号数据，确定要停止吗？')) {
+        return;
+    }
     await api(`/api/accounts/${id}/stop`, 'POST');
     loadAccounts();
     pollAccountLogs();

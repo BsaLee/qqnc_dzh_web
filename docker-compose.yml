@@ -4,9 +4,17 @@ services:
     container_name: qq-farm-bot-ui
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:${PORT:-3000}"
     environment:
-      - ADMIN_PASSWORD=admin
-      - TZ=Asia/Shanghai
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-3000}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - TZ=${TZ:-Asia/Shanghai}
     volumes:
       - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:${PORT:-3000}/api/ping', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

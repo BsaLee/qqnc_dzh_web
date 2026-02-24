@@ -225,11 +225,38 @@ function startAdminServer(dataProvider) {
         }
     });
 
-    // API: 停止账号
+    // API: 停止账号（停止并删除）
     app.post('/api/accounts/:id/stop', (req, res) => {
         try {
-            provider.stopAccount(req.params.id);
-            res.json({ ok: true });
+            const userAccountId = req.accountId;
+            const accountId = req.params.id;
+            
+            // 用户只能停止自己的账号
+            if (String(accountId) !== String(userAccountId)) {
+                return res.status(403).json({ ok: false, error: 'Forbidden' });
+            }
+            
+            // 获取账号信息用于日志
+            const accounts = store.getAccounts();
+            const target = (accounts.accounts || []).find(a => String(a.id) === String(accountId));
+            
+            // 停止 worker
+            provider.stopAccount(accountId);
+            
+            // 删除账号数据
+            const data = deleteAccount(accountId);
+            
+            // 记录日志
+            if (provider.addAccountLog) {
+                provider.addAccountLog(
+                    'stop_delete',
+                    `停止并删除账号: ${(target && target.name) || accountId}`,
+                    accountId,
+                    target ? target.name : ''
+                );
+            }
+            
+            res.json({ ok: true, data });
         } catch (e) {
             res.status(500).json({ ok: false, error: e.message });
         }

@@ -561,15 +561,20 @@ function handleWorkerMessage(accountId, msg) {
         }
     } else if (msg.type === 'account_kicked') {
         const reason = msg.reason || '未知';
-        log('系统', `账号 ${worker.name} 被踢下线，已自动停止账号`);
+        log('系统', `账号 ${worker.name} 被踢下线，已自动删除账号`);
         triggerOfflineReminder({
             accountId,
             accountName: worker.name,
             reason: `kickout:${reason}`,
             offlineMs: 0,
         });
-        addAccountLog('kickout_stop', `账号 ${worker.name} 被踢下线，已自动停止`, accountId, worker.name, { reason });
+        addAccountLog('kickout_delete', `账号 ${worker.name} 被踢下线，已自动删除`, accountId, worker.name, { reason });
         stopWorker(accountId);
+        try {
+            deleteAccount(accountId);
+        } catch (e) {
+            log('错误', `删除被踢下线账号失败: ${e.message}`);
+        }
     } else if (msg.type === 'api_response') {
         const { id, result, error } = msg;
         const req = worker.requests.get(id);
@@ -690,7 +695,14 @@ const dataProvider = {
         if (acc) startWorker(acc);
     },
 
-    stopAccount: (id) => stopWorker(id),
+    stopAccount: (id) => {
+        stopWorker(id);
+        try {
+            deleteAccount(id);
+        } catch (e) {
+            log('错误', `删除停止的账号失败: ${e.message}`);
+        }
+    },
     restartAccount: (id) => {
         const data = getAccounts();
         const acc = data.accounts.find(a => a.id === id);

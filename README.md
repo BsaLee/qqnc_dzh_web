@@ -214,8 +214,49 @@ GET /api/system-info
 ## 环境要求
 - 源码运行：Node.js 18+
 - 二进制发布运行：无需安装 Node.js
+- Docker 部署：Docker 20.10+ 和 Docker Compose 2.0+
 
 ## 安装与启动
+
+### 🐳 Docker 部署（推荐）
+
+Docker 部署是最简单的方式，无需安装 Node.js，一键启动。
+
+#### Windows 快速启动
+
+1. 安装 [Docker Desktop](https://www.docker.com/products/docker-desktop)
+2. 双击运行 `start.bat`
+3. 访问 `http://localhost:3000`
+
+#### Linux/macOS 快速启动
+
+```bash
+# 给脚本添加执行权限
+chmod +x start.sh
+
+# 运行启动脚本
+./start.sh
+
+# 访问面板
+# http://localhost:3000
+```
+
+#### 手动部署
+
+```bash
+# 1. 启动服务
+docker compose up -d
+
+# 2. 查看日志
+docker compose logs -f
+
+# 3. 停止服务
+docker compose down
+```
+
+详细的 Docker 部署文档请查看 [DOCKER.md](DOCKER.md)
+
+---
 
 ### Windows
 
@@ -287,9 +328,25 @@ ADMIN_PASSWORD='你的强密码' node client.js
 ### Docker 部署
 
 项目已提供以下文件：
-- `Dockerfile`
-- `docker-compose.yml`
-- `.dockerignore`
+- `Dockerfile` - Docker 镜像构建文件
+- `docker-compose.yml` - Docker Compose 配置
+- `.dockerignore` - Docker 构建忽略文件
+- `start.sh` - Linux/macOS 快速启动脚本
+- `start.bat` - Windows 快速启动脚本
+- `DOCKER.md` - 详细的 Docker 部署文档
+
+#### 快速启动
+
+**Windows:**
+```cmd
+双击运行 start.bat
+```
+
+**Linux/macOS:**
+```bash
+chmod +x start.sh
+./start.sh
+```
 
 #### 使用 Docker Compose（推荐）
 
