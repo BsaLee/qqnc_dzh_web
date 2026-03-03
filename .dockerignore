@@ -1,20 +1,35 @@
+# Dependencies
 node_modules
-npm-debug.log
+**/node_modules
+.pnpm-store
+
+# Build artifacts
 dist
-backup
+**/dist
+core/dist-*
+core/dist-nest
+web/stats.html
+coverage
+
+# Runtime data
 data
+core/data
+backup
+
+# VCS & dev files
 .git
-.gitignore
-.dockerignore
+.github
 .vscode
+.idea
+
+# Env & logs
 .env
-.env.example
+.env.*
 *.local
-.DS_Store
 *.log
-README.md
-DOCKER.md
-LICENSE
-Update.log
-start.sh
-start.bat
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
