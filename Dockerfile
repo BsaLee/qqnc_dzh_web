@@ -45,6 +45,9 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
+# Install pnpm for runtime (in case any dependencies need it)
+RUN npm install -g pnpm
+
 ENV NODE_ENV=production
 ENV TZ=Asia/Shanghai
 
